@@ -38,6 +38,7 @@ else:
     USER_TO_CONVERSATION_ID = {}
 
 
+
 @dispatcher.message_handler(commands=["free"])
 async def show_message_count(message: types.Message):
     user_id = str(message.from_user.id)
@@ -59,6 +60,16 @@ async def start(message: types.Message):
 
 @dispatcher.message_handler()
 async def handle_message(message: types.Message) -> None:
+
+    # Load message counts from a JSON file (if it exists)
+    if os.path.isfile("message_counts.json"):
+        # If it exists, load the data from the file
+        with open("message_counts.json", "r") as f:
+            USER_TO_CONVERSATION_ID = json.load(f)
+    else:
+        # If it doesn't exist, create an empty dictionary
+        USER_TO_CONVERSATION_ID = {}
+
     user_id = str(message.from_user.id)
 
     # Check if user ID exists in the dictionary
