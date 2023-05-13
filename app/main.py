@@ -78,7 +78,7 @@ async def handle_message(message: types.Message) -> None:
         USER_TO_CONVERSATION_ID[user_id] += 1
     else:
         # Add user ID to the dictionary with an initial count of 1
-        USER_TO_CONVERSATION_ID[user_id] = str(1)
+        USER_TO_CONVERSATION_ID[user_id] = 1
 
     # Check if message count for the user exceeds 100
     if int(USER_TO_CONVERSATION_ID[user_id]) > 100:
