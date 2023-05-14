@@ -99,7 +99,7 @@ async def handle_message(message: types.Message) -> None:
         USER_TO_CONVERSATION_ID[user_id] = 1
 
     # Check if message count for the user exceeds 100
-    if int(USER_TO_CONVERSATION_ID[user_id]) > 100:
+    if int(USER_TO_CONVERSATION_ID[user_id]) > 50:
         await bot.send_message(message.from_user.id, text=""" К сожалению, твой лимит бесплатный сообщений закончился. 
 Напиши @ilyaberdysh, чтобы оплатить платный тариф (500 рублей - безлимит в месяц) и продолжить общение!""")
         with open("message_counts.json", "w") as f:
