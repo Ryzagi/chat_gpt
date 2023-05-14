@@ -13,7 +13,7 @@ from langchain.schema import messages_from_dict, messages_to_dict
 
 DATABASE_DIR = Path(__file__).parent / "database"
 
-token = "5884042159:AAF1Mc47CyEkXLhYPKrdYQGXfWWcpIB1qNk"
+token = "5773057098:AAF-XmWQQW8RaadhZdEpJ0ZELJdcco3XU3M"
 bot = Bot(token=token)  # args.telegram_token
 storage = MemoryStorage()
 
@@ -128,6 +128,8 @@ async def handle_message(message: types.Message) -> None:
         ingest_to_db = messages_to_dict(extracted_messages)
         with open(DATABASE_DIR/f"{message.from_user.id}.json", "w", encoding="utf-8") as f:
             json.dump(ingest_to_db, f)
+        with open("message_counts.json", "w") as f:
+            json.dump(USER_TO_CONVERSATION_ID, f)
     else:
 
         await bot.send_message(user_id, text="Привет! Чтобы запустить бота, нажми команду /start")
