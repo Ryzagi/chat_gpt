@@ -13,7 +13,7 @@ from langchain.schema import messages_from_dict, messages_to_dict
 
 DATABASE_DIR = Path(__file__).parent / "database"
 
-token = "5773057098:AAF-XmWQQW8RaadhZdEpJ0ZELJdcco3XU3M"
+token = "5884042159:AAF1Mc47CyEkXLhYPKrdYQGXfWWcpIB1qNk"
 bot = Bot(token=token)  # args.telegram_token
 storage = MemoryStorage()
 
