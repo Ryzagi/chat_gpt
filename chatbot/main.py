@@ -35,11 +35,12 @@ async def show_message_count(message: types.Message):
         with open("message_counts.json", "r") as f:
             USER_TO_CONVERSATION_ID = json.load(f)
     else:
+        USER_TO_CONVERSATION_ID = {}
         # If it doesn't exist, create an empty dictionary
         await bot.send_message(user_id, text="Привет! Чтобы запустить бота, нажми команду /start")
 
     count = USER_TO_CONVERSATION_ID[user_id]
-    remaining = 100 - int(count)
+    remaining = 50 - int(count)
     await bot.send_message(user_id, text=f"У тебя осталось {remaining} бесплатных сообщений.")
 
 
