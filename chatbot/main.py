@@ -26,6 +26,18 @@ conversation = ConversationChain(
     memory=ConversationBufferMemory()
 )
 
+@dispatcher.message_handler(commands=["buy"])
+async def show_message_count(message: types.Message):
+    await bot.send_message(message.from_user.id, text="""Премиум:
+- безлимитный доступ и общение с телеграм-ботом
+- подписка на все обновления
+- приоритетная поддержка
+
+990 руб/мес. - оплатить""")
+
+
+
+
 @dispatcher.message_handler(commands=["free"])
 async def show_message_count(message: types.Message):
     user_id = str(message.from_user.id)
