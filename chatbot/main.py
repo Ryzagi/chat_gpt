@@ -30,6 +30,7 @@ conversation = ConversationChain(
 
 @dispatcher.message_handler(commands=["buy"])
 async def show_message_count(message: types.Message):
+    await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
     await bot.send_message(message.from_user.id, text="""Премиум:
 - безлимитный доступ и общение с телеграм-ботом
 - подписка на все обновления
@@ -42,6 +43,7 @@ async def show_message_count(message: types.Message):
 
 @dispatcher.message_handler(commands=["free"])
 async def show_message_count(message: types.Message):
+    await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
     user_id = str(message.from_user.id)
     # Load message counts from a JSON file (if it exists)
     if os.path.isfile("message_counts.json"):
@@ -60,6 +62,7 @@ async def show_message_count(message: types.Message):
 
 @dispatcher.message_handler(commands=["start"])
 async def start(message: types.Message):
+    await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
     data = [
         {
             'type': 'human',
@@ -134,6 +137,7 @@ async def handle_message(message: types.Message) -> None:
             verbose=True,
             memory=retrieved_memory
         )
+        await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
         chatbot_response = reloaded_chain.run(input=translated_message)
         translated_chabot_respons = translate(chatbot_response, from_lang="en", to_lang="ru")
         await bot.send_message(message.from_user.id, text=translated_chabot_respons)
