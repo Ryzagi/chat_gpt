@@ -11,7 +11,7 @@ from aiogram.utils import executor
 
 from langchain.schema import messages_from_dict, messages_to_dict
 
-from chatbot.translate import translate
+from translate import translate
 
 DATABASE_DIR = Path(__file__).parent / "database"
 
