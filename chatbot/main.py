@@ -92,7 +92,7 @@ async def start(message: types.Message):
 
 @dispatcher.message_handler()
 async def handle_message(message: types.Message) -> None:
-    translated_message = translate(message.text)
+    translated_message = translate(message.text, from_lang="ru", to_lang="en")
     # Load message counts from a JSON file (if it exists)
     if os.path.isfile("message_counts.json"):
         # If it exists, load the data from the file
@@ -135,7 +135,8 @@ async def handle_message(message: types.Message) -> None:
             memory=retrieved_memory
         )
         chatbot_response = reloaded_chain.run(input=translated_message)
-        await bot.send_message(message.from_user.id, text=chatbot_response)
+        translated_chabot_respons = translate(chatbot_response, from_lang="en", to_lang="ru")
+        await bot.send_message(message.from_user.id, text=translated_chabot_respons)
         with open(DATABASE_DIR/f"{message.from_user.id}.json", "w") as f:
             json.dump(USER_TO_CONVERSATION_ID, f)
 
