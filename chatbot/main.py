@@ -11,6 +11,8 @@ from aiogram.utils import executor
 
 from langchain.schema import messages_from_dict, messages_to_dict
 
+from chatbot.translate import translate
+
 DATABASE_DIR = Path(__file__).parent / "database"
 
 token = "5884042159:AAF1Mc47CyEkXLhYPKrdYQGXfWWcpIB1qNk"
@@ -90,6 +92,7 @@ async def start(message: types.Message):
 
 @dispatcher.message_handler()
 async def handle_message(message: types.Message) -> None:
+    translated_message = translate(message.text)
     # Load message counts from a JSON file (if it exists)
     if os.path.isfile("message_counts.json"):
         # If it exists, load the data from the file
@@ -131,7 +134,7 @@ async def handle_message(message: types.Message) -> None:
             verbose=True,
             memory=retrieved_memory
         )
-        chatbot_response = reloaded_chain.run(input=message.text)
+        chatbot_response = reloaded_chain.run(input=translated_message)
         await bot.send_message(message.from_user.id, text=chatbot_response)
         with open(DATABASE_DIR/f"{message.from_user.id}.json", "w") as f:
             json.dump(USER_TO_CONVERSATION_ID, f)
