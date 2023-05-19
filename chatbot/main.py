@@ -5,6 +5,7 @@ import os
 import argparse
 
 from pathlib import Path
+
 from langchain.memory import ConversationBufferMemory, ChatMessageHistory
 from langchain.llms import OpenAI
 from langchain import ConversationChain, PromptTemplate
@@ -37,7 +38,7 @@ storage = MemoryStorage()
 
 dispatcher = Dispatcher(bot, storage=storage, loop=asyncio.get_event_loop())
 
-LLM = OpenAI(model_name="gpt-3.5-turbo")
+LLM = OpenAI(model_name="gpt-3.5-turbo", stop=["\nHuman:"])
 
 ROLES_FILE = "config/roles.json"
 USER_ROLES_FILE = "user_roles.json"
@@ -190,7 +191,7 @@ async def handle_message(message: types.Message) -> None:
             llm=LLM,
             verbose=True,
             memory=retrieved_memory,
-            prompt=PROMPT
+            prompt=PROMPT,
         )
         await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
         chatbot_response = reloaded_chain.run(input=translated_message)
