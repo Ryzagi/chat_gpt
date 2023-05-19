@@ -64,9 +64,9 @@ async def set_role(message: types.Message):
         # Save user roles
         save_user_roles(user_roles_file=USER_ROLES_FILE, user_roles=USER_ROLES)
 
-        await bot.send_message(message.from_user.id, text=f"Role set to: {role['name']}")
+        await bot.send_message(message.from_user.id, text=f"Включена роль: {role['name']}")
     else:
-        await bot.send_message(message.from_user.id, text="Invalid role command")
+        await bot.send_message(message.from_user.id, text="Неправильная команда")
 
 
 @dispatcher.message_handler(commands=["buy"])
