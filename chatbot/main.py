@@ -2,6 +2,8 @@ import asyncio
 import atexit
 import json
 import os
+import argparse
+
 from pathlib import Path
 from langchain.memory import ConversationBufferMemory, ChatMessageHistory
 from langchain.llms import OpenAI
@@ -18,8 +20,17 @@ from translate import translate
 
 DATABASE_DIR = Path(__file__).parent / "database"
 
-token = "5773057098:AAF-XmWQQW8RaadhZdEpJ0ZELJdcco3XU3M"
-bot = Bot(token=token)  # args.telegram_token
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--telegram_token", default=token)
+    args = parser.parse_args()
+    return args
+
+
+args = parse_args()
+
+bot = Bot(token=args.telegram_token)
 storage = MemoryStorage()
 
 dispatcher = Dispatcher(bot, storage=storage, loop=asyncio.get_event_loop())
@@ -198,6 +209,7 @@ async def handle_message(message: types.Message) -> None:
     else:
 
         await bot.send_message(user_id, text="Привет! Чтобы запустить бота, нажми команду /start")
+
 
 # Save user roles before the bot exits
 atexit.register(save_user_roles, user_roles_file=USER_ROLES_FILE, user_roles=USER_ROLES)
