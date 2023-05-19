@@ -120,8 +120,10 @@ async def start(message: types.Message):
     ]
     if not os.path.isdir(DATABASE_DIR):
         os.mkdir(DATABASE_DIR)
-    with open(DATABASE_DIR / f"{message.from_user.id}.json", 'w', encoding="utf-8") as f:
-        json.dump(data, f)
+
+    if not os.path.isfile(DATABASE_DIR / f"{message.from_user.id}.json"):
+        with open(DATABASE_DIR / f"{message.from_user.id}.json", 'w', encoding="utf-8") as f:
+            json.dump(data, f)
 
     await bot.send_message(message.from_user.id, text=""" Привет! Я ИИ-компаньон chatGPT. Помогу тебе с рабочими задачами, генерацией контента и идей!
 
