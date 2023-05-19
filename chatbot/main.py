@@ -23,7 +23,9 @@ DATABASE_DIR = Path(__file__).parent / "database"
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--telegram_token", default=token)
+    parser.add_argument(
+        "--telegram_token", help="Telegram bot token", type=str, required=True
+    )
     args = parser.parse_args()
     return args
 
