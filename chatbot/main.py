@@ -15,12 +15,14 @@ from aiogram.utils import executor
 
 from langchain.schema import messages_from_dict, messages_to_dict
 
-from prompt import DEFAULT_TEMPLATE, Prompt
+from config import DEFAULT_TEMPLATE, Prompt, WELCOME_MESSAGE, DATA_STRUCTURE, PREMIUM_MESSAGE, LIMIT_MESSAGE, \
+    ERROR_MESSAGE
 from utils import load_roles_from_file, load_user_roles, save_user_roles
 from translate import translate
 
 DATABASE_DIR = Path(__file__).parent / "database"
-
+ROLES_FILE = "config/roles.json"
+USER_ROLES_FILE = "user_roles.json"
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -40,8 +42,6 @@ dispatcher = Dispatcher(bot, storage=storage, loop=asyncio.get_event_loop())
 
 LLM = OpenAI(model_name="gpt-3.5-turbo", stop=["\nHuman:"])
 
-ROLES_FILE = "config/roles.json"
-USER_ROLES_FILE = "user_roles.json"
 
 # Load roles from the JSON file
 ROLES = load_roles_from_file(ROLES_FILE)
@@ -72,12 +72,7 @@ async def set_role(message: types.Message):
 @dispatcher.message_handler(commands=["buy"])
 async def show_message_count(message: types.Message):
     await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
-    await bot.send_message(message.from_user.id, text="""Премиум:
-- безлимитный доступ и общение с телеграм-ботом
-- подписка на все обновления
-- приоритетная поддержка
-
-990 руб/мес. - оплатить""")
+    await bot.send_message(message.from_user.id, text=PREMIUM_MESSAGE)
 
 
 @dispatcher.message_handler(commands=["free"])
@@ -92,7 +87,7 @@ async def show_message_count(message: types.Message):
     else:
         USER_TO_CONVERSATION_ID = {}
         # If it doesn't exist, create an empty dictionary
-        await bot.send_message(user_id, text="Привет! Чтобы запустить бота, нажми команду /start")
+        await bot.send_message(user_id, text=ERROR_MESSAGE)
     print(USER_TO_CONVERSATION_ID)
     count = USER_TO_CONVERSATION_ID[user_id]
     remaining = 50 - int(count)
@@ -102,36 +97,14 @@ async def show_message_count(message: types.Message):
 @dispatcher.message_handler(commands=["start"])
 async def start(message: types.Message):
     await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
-    data = [
-        {
-            'type': 'human',
-            'data': {
-                'content': '',
-                'additional_kwargs': {}
-            }
-        },
-        {
-            'type': 'ai',
-            'data': {
-                'content': '',
-                'additional_kwargs': {}
-            }
-        }
-    ]
     if not os.path.isdir(DATABASE_DIR):
         os.mkdir(DATABASE_DIR)
 
     if not os.path.isfile(DATABASE_DIR / f"{message.from_user.id}.json"):
         with open(DATABASE_DIR / f"{message.from_user.id}.json", 'w', encoding="utf-8") as f:
-            json.dump(data, f)
+            json.dump(DATA_STRUCTURE, f)
 
-    await bot.send_message(message.from_user.id, text=""" Привет! Я ИИ-компаньон chatGPT. Помогу тебе с рабочими задачами, генерацией контента и идей!
-
-Подпишись на наш канал, чтобы быть в курсе обновлений и новостей из мира нейросетей - https://t.me/neurocompanion
-
-Если у тебя есть идеи по развитию бота или вопросы, пиши @ilyaberdysh
-
-Давай знакомиться, спроси у меня что-нибудь """)
+    await bot.send_message(message.from_user.id, text=WELCOME_MESSAGE)
 
 
 @dispatcher.message_handler()
@@ -146,7 +119,7 @@ async def handle_message(message: types.Message) -> None:
     else:
         # If it doesn't exist, create an empty dictionary
         USER_TO_CONVERSATION_ID = {}
-        await bot.send_message(message.from_user.id, text="Привет! Чтобы запустить бота, нажми команду /start")
+        await bot.send_message(message.from_user.id, text=ERROR_MESSAGE)
 
     user_id = str(message.from_user.id)
 
@@ -163,8 +136,7 @@ async def handle_message(message: types.Message) -> None:
 
     # Check if message count for the user exceeds 50
     if int(USER_TO_CONVERSATION_ID[user_id]) > 50:
-        await bot.send_message(message.from_user.id, text=""" К сожалению, твой лимит бесплатный сообщений закончился. 
-Напиши @ilyaberdysh, чтобы оплатить платный тариф (500 рублей - безлимит в месяц) и продолжить общение!""")
+        await bot.send_message(message.from_user.id, text=LIMIT_MESSAGE)
         with open("message_counts.json", "w") as f:
             json.dump(USER_TO_CONVERSATION_ID, f)
         return
@@ -184,7 +156,7 @@ async def handle_message(message: types.Message) -> None:
             # Find the role prompt for the current role
             role_prompt = next((r["prompt"] for r in ROLES if r["name"] == current_role), "")
             Prompt.prompt = role_prompt
-
+            print(Prompt.prompt)
         else:
             Prompt.prompt = DEFAULT_TEMPLATE
 
@@ -197,9 +169,9 @@ async def handle_message(message: types.Message) -> None:
         )
         await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
         chatbot_response = reloaded_chain.run(input=translated_message)
-        translated_chabot_respons = translate(chatbot_response, from_lang="en", to_lang="ru")
+        translated_chatbot_response = translate(chatbot_response, from_lang="en", to_lang="ru")
         await bot.send_chat_action(message.from_user.id, action=types.ChatActions.TYPING)
-        await bot.send_message(message.from_user.id, text=translated_chabot_respons)
+        await bot.send_message(message.from_user.id, text=translated_chatbot_response)
         with open(DATABASE_DIR / f"{message.from_user.id}.json", "w") as f:
             json.dump(USER_TO_CONVERSATION_ID, f)
 
@@ -213,7 +185,7 @@ async def handle_message(message: types.Message) -> None:
             json.dump(USER_TO_CONVERSATION_ID, f)
     else:
 
-        await bot.send_message(user_id, text="Привет! Чтобы запустить бота, нажми команду /start")
+        await bot.send_message(user_id, text=ERROR_MESSAGE)
 
 
 # Save user roles before the bot exits
