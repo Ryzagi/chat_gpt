@@ -50,7 +50,7 @@ ROLES = load_roles_from_file(ROLES_FILE)
 USER_ROLES = load_user_roles(user_roles_file=USER_ROLES_FILE)
 
 
-@dispatcher.message_handler(commands=["career_assistant", "psychotherapist, main_assistant"])
+@dispatcher.message_handler(commands=["career_assistant", "psychotherapist", "main_assistant"])
 async def set_role(message: types.Message):
     user_id = str(message.from_user.id)
     command = message.get_command()
